@@ -9,17 +9,18 @@ def main():
     screen_height = 660
     gray = (29, 29, 27)
     screen = pygame.display.set_mode((screen_width, screen_height))
-    pygame.display.set_caption("Rockett Kitty Blast")
-    #clock = pygame.time.Clock()
-    while True:
+    pygame.display.set_caption("Rocket Kitty Blast")
+    clock = pygame.time.Clock()
+    running = True
+    while running:
         # Checking for events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
         screen.fill(gray)
-        #pygame.display.update()
-        #clock.tick(60)
+        pygame.display.update()
+        clock.tick(60)
 
 if __name__ == "__main__":
     main()
