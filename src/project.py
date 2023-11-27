@@ -1,6 +1,12 @@
 import pygame
 import sys
 
+player_img = pygame.image.load('rocket_kitty_player.png')
+
+def player():
+    screen = pygame.display.set_mode()
+    screen.blit(player_img, (370, 480))
+    player()
 
 def main():
     pygame.init()
