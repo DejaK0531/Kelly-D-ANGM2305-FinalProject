@@ -2,7 +2,6 @@ import pygame
 import sys
 
 
-
 def main():
     pygame.init()
     screen_width = 750
@@ -10,9 +9,9 @@ def main():
     screen = pygame.display.set_mode((screen_width, screen_height))
     intro_bg = pygame.image.load('intro_bg.png')
     background = pygame.image.load('rocket_kitty_bg.png')
-    icon = pygame.image.load('rocket_kitty.png')
+    icon = pygame.image.load('rocket_kitty_icon.png')
     pygame.display.set_icon(icon)
-    pygame.display.set_caption("Rocket Kitty Blast")
+    pygame.display.set_caption("Rocket Kitty Blast!")
     clock = pygame.time.Clock()
 
     
