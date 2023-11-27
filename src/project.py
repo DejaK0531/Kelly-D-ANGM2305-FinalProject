@@ -19,7 +19,7 @@ def main():
     running = True
     while running:
         # Checking for events
-        screen.blit(background,(0, 0))
+        screen.blit(pygame.transform.scale(background, (750, 660)), (0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
