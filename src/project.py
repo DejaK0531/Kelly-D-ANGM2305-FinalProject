@@ -17,23 +17,35 @@ def main():
 
     
     # fade in the logo
-    for i in range(255):
-        screen.fill((0,0,0))
-        intro_bg.set_alpha(i)
-        screen.blit(pygame.transform.scale(intro_bg, (750, 660)), (0,0))
-        pygame.display.flip()
-        pygame.time.delay(10)  # Add a small delay for a smoother fade-in
+    fade_duration = 2000  # in milliseconds (2 seconds)
+    fade_start_time = pygame.time.get_ticks()
+    pygame.time.delay(15)  # Add a small delay for a smoother fade-in
 
     running = True
     while running:
         # Checking for events
-        screen.blit(pygame.transform.scale(background, (750, 660)), (0, 0))
+        current_time = pygame.time.get_ticks()
+        elapsed_time = current_time - fade_start_time
+
+        if elapsed_time < fade_duration:
+            alpha = int((elapsed_time / fade_duration) * 255)
+            intro_bg.set_alpha(alpha)
+            screen.blit(pygame.transform.scale(intro_bg, (750, 660)), (0, 0))
+
+        else:
+            # Image stays on screen for a few seconds before fading out
+            screen.blit(pygame.transform.scale(background, (750, 660)), (0, 0))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-        pygame.display.update()
-        clock.tick(20)
+                running = False
+
+        pygame.display.flip()
+        clock.tick(30)
+    
+    pygame.quit()
+    sys.exit()
+    pygame.display.update()
 
 if __name__ == "__main__":
     main()
