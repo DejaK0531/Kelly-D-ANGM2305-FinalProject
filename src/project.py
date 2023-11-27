@@ -1,27 +1,11 @@
 import pygame
 import sys
 
-def fade_in_intro(screen, intro_bg):
-    fade_duration = 2000  # in milliseconds (2 seconds)
-    fade_start_time = pygame.time.get_ticks()
-    pygame.time.delay(15)  # Add a small delay for a smoother fade-in
-
-    while elapsed_time < fade_duration:
-        current_time = pygame.time.get_ticks()
-        elapsed_time = current_time - fade_start_time
-
-        alpha = int((elapsed_time / fade_duration) * 255)
-        intro_bg.set_alpha(alpha)
-
-        screen.fill((0, 0, 0))  # Clear the screen
-        screen.blit(pygame.transform.scale(intro_bg, (750, 660)), (0, 0))
-        pygame.display.flip()
-        
 def main():
-    screen, intro_bg, background, player_img, clock = initialize()
+    screen, intro_bg, background, player_img, clock, fade_duration, fade_start_time = initialize()
 
     # fade in the logo
-    fade_in_intro(screen, intro_bg)
+    fade_in_intro(screen, intro_bg, fade_duration, fade_start_time)
 
     running = True
     while running:
@@ -67,8 +51,26 @@ def initialize():
     pygame.display.set_icon(icon)
     pygame.display.set_caption("Rocket Kitty Blast!")
     clock = pygame.time.Clock()
+    fade_duration = 2000  # in milliseconds (2 seconds)
+    fade_start_time = pygame.time.get_ticks()
 
-    return screen, intro_bg, background, player_img, clock
+    return screen, intro_bg, background, player_img, clock, fade_duration, fade_start_time
+
+def fade_in_intro(screen, intro_bg, fade_duration, fade_start_time):
+    pygame.time.delay(15)  # Add a small delay for a smoother fade-in
+
+    elapsed_time = 0  # Initialize elapsed_time
+
+    while elapsed_time < fade_duration:
+        current_time = pygame.time.get_ticks()
+        elapsed_time = current_time - fade_start_time
+
+        alpha = int((elapsed_time / fade_duration) * 255)
+        intro_bg.set_alpha(alpha)
+
+        screen.fill((0, 0, 0))  # Clear the screen
+        screen.blit(pygame.transform.scale(intro_bg, (750, 660)), (0, 0))
+        pygame.display.flip()
 
 if __name__ == "__main__":
     main()
