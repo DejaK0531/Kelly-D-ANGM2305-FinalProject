@@ -9,10 +9,16 @@ screen_height = 700
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Rockett Kitty Blast")
 
-# clock = pygame.time.Clock()
+#clock = pygame.time.Clock()
 
 while True:
+    # Checking for events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+    
+    # Drawing
+    
+    #pygame.display.update()
+    #clock.tick(60)
