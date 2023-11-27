@@ -1,16 +1,19 @@
 import pygame
 import sys
 
-class Laser(pygame.sprite.Sprite):
-    def __init__(self, position):
+class Bullets(pygame.sprite.Sprite):
+    def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((4, 15))
-        self.image.fill((255, 255, 255))
-        self.rect = self.image.get_rect(center = position)
-        self.speed = speed
+        self.image = pygame.Surface((5, 20))  # Adjust the size as needed
+        self.image.fill((255, 255, 255))  # Red color for the laser
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.speed = -10  # Adjust the speed as needed
 
     def update(self):
-        self.rect.y -=
+        self.rect.y += self.speed
+        if self.rect.bottom < 0:
+            self.kill()    
 
 def fade_in_intro(screen, intro_bg, fade_duration, fade_start_time):
     pygame.time.delay(15)  # Add a small delay for a smoother fade-in
@@ -43,11 +46,6 @@ def main():
     fade_duration = 2000  # in milliseconds (2 seconds)
     fade_start_time = pygame.time.get_ticks()
 
-    # Making lasers
-    laser = Laser((100, 100))
-    laser2 = Laser((100, 100))
-    lasers_group = pygame.sprite.Group()
-    lasers_group.add(laser, laser2)
 
     # Fade in the logo
     fade_in_intro(screen, intro_bg, fade_duration, fade_start_time)
@@ -55,16 +53,19 @@ def main():
     # Player movement
     player_x = screen.get_width() // 2 - player_img.get_width() // 2
     player_y = screen.get_height() - player_img.get_height()
-    player_speed = 5  # Adjust the speed as needed
+    player_speed = 5
+
+    bullets = pygame.sprite.Group()
 
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                bullets = Bullets(player_x + player_img.get_width() // 2, player_y)
+                bullets.add(bullets)
         
-        lasers_group.draw(screen)
-
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and player_x > 0:
             player_x -= player_speed
@@ -82,8 +83,9 @@ def main():
         else:
             screen.blit(pygame.transform.scale(background, (750, 660)), (0, 0))
             screen.blit(player_img, (player_x, player_y))
-
-
+        
+        bullets.update()
+        bullets.draw(screen)
         pygame.display.flip()
         clock.tick(30)
     
