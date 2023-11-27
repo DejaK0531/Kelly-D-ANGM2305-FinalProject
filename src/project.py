@@ -1,7 +1,7 @@
 import pygame
 import sys
 
-class Bullets(pygame.sprite.Sprite):
+class Laser(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.image = pygame.Surface((5, 20))  # Adjust the size as needed
@@ -55,7 +55,7 @@ def main():
     player_y = screen.get_height() - player_img.get_height()
     player_speed = 5
 
-    bullets = pygame.sprite.Group()
+    lasers = pygame.sprite.Group()
 
     running = True
     while running:
@@ -63,8 +63,8 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                bullets = Bullets(player_x + player_img.get_width() // 2, player_y)
-                bullets.add(bullets)
+                laser = Laser(player_x + player_img.get_width() // 2, player_y)
+                lasers.add(laser)
         
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and player_x > 0:
@@ -84,8 +84,8 @@ def main():
             screen.blit(pygame.transform.scale(background, (750, 660)), (0, 0))
             screen.blit(player_img, (player_x, player_y))
         
-        bullets.update()
-        bullets.draw(screen)
+        lasers.update()
+        lasers.draw(screen)
         pygame.display.flip()
         clock.tick(30)
     
