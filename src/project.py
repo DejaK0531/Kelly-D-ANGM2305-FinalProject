@@ -7,12 +7,25 @@ def main():
     # fade in the logo
     fade_in_intro(screen, intro_bg, fade_duration, fade_start_time)
 
+    # Added player_x and player_y for rocket position
+    player_x = screen.get_width() // 2 - player_img.get_width() // 2
+    player_y = screen.get_height() - player_img.get_height()
+
+    # Added player_speed for rocket movement speed
+    player_speed = 5  # Adjust the speed as needed
+
     running = True
     while running:
         # Checking for events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+        
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and player_x > 0:
+            player_x -= player_speed
+        if keys[pygame.K_RIGHT] and player_x < screen.get_width() - player_img.get_width():
+            player_x += player_speed
 
         # Continue with the main game loop
         current_time = pygame.time.get_ticks()
@@ -27,10 +40,8 @@ def main():
             # Image stays on screen for a few seconds before fading out
             screen.blit(pygame.transform.scale(background, (750, 660)), (0, 0))
             
-            # Display rocket sprite at the bottom center of the screen
-            rocket_position = (screen.get_width() // 2 - player_img.get_width() // 2,
-                               screen.get_height() - player_img.get_height())
-            screen.blit(player_img, rocket_position)
+            # Display rocket sprite at the updated position
+            screen.blit(player_img, (player_x, player_y))
 
         pygame.display.flip()
         clock.tick(30)
