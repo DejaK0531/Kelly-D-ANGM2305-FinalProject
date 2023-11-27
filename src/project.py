@@ -22,6 +22,7 @@ def main():
         intro_bg.set_alpha(i)
         screen.blit(pygame.transform.scale(intro_bg, (750, 660)), (0,0))
         pygame.display.flip()
+        pygame.time.delay(10)  # Add a small delay for a smoother fade-in
 
     running = True
     while running:
