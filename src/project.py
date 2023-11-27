@@ -14,7 +14,7 @@ def main():
     clock = pygame.time.Clock()
     background = (0, 0, 0)
     #intro_bg = pygame.image.load('bg.png')
-    background = pygame.image.load('bg.png')
+    background = pygame.image.load('rocket_kitty_bg.png')
 
     running = True
     while running:
