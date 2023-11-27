@@ -1,6 +1,17 @@
 import pygame
 import sys
 
+class Laser(pygame.sprite.Sprite):
+    def __init__(self, position):
+        super().__init__()
+        self.image = pygame.Surface((4, 15))
+        self.image.fill((255, 255, 255))
+        self.rect = self.image.get_rect(center = position)
+        self.speed = speed
+
+    def update(self):
+        self.rect.y -=
+
 def fade_in_intro(screen, intro_bg, fade_duration, fade_start_time):
     pygame.time.delay(15)  # Add a small delay for a smoother fade-in
 
@@ -17,7 +28,7 @@ def fade_in_intro(screen, intro_bg, fade_duration, fade_start_time):
         screen.blit(pygame.transform.scale(intro_bg, (750, 660)), (0, 0))
         pygame.display.flip()
 
-def initialize_and_run_game():
+def main():
     pygame.init()
     screen_width = 750
     screen_height = 660
@@ -32,24 +43,27 @@ def initialize_and_run_game():
     fade_duration = 2000  # in milliseconds (2 seconds)
     fade_start_time = pygame.time.get_ticks()
 
-    # fade in the logo
+    # Making lasers
+    laser = Laser((100, 100))
+    laser2 = Laser((100, 100))
+    lasers_group = pygame.sprite.Group()
+    lasers_group.add(laser, laser2)
+
+    # Fade in the logo
     fade_in_intro(screen, intro_bg, fade_duration, fade_start_time)
 
+    # Player movement
     player_x = screen.get_width() // 2 - player_img.get_width() // 2
     player_y = screen.get_height() - player_img.get_height()
-
     player_speed = 5  # Adjust the speed as needed
-
-    lasers = pygame.sprite.Group()
 
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                laser = Laser(player_x + player_img.get_width() // 2, player_y)
-                lasers.add(laser)
+        
+        lasers_group.draw(screen)
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and player_x > 0:
@@ -69,8 +83,6 @@ def initialize_and_run_game():
             screen.blit(pygame.transform.scale(background, (750, 660)), (0, 0))
             screen.blit(player_img, (player_x, player_y))
 
-        lasers.update()
-        lasers.draw(screen)
 
         pygame.display.flip()
         clock.tick(30)
@@ -80,4 +92,4 @@ def initialize_and_run_game():
     pygame.display.update()
 
 if __name__ == "__main__":
-    initialize_and_run_game()
+    main()
