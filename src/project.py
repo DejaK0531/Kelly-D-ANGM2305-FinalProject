@@ -1,5 +1,10 @@
 import pygame
 import sys
+import os
+from obstacles import Block
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 
 class Laser(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -14,6 +19,39 @@ class Laser(pygame.sprite.Sprite):
         self.rect.y += self.speed
         if self.rect.bottom < 0:
             self.kill()
+
+class Obstacle(pygame.sprite.Sprite):
+     # Obstacle Setup
+    shape = [
+        "  xxxxxxx",
+        " xxxxxxxxx",
+        "xxxxxxxxxxx",
+        "xxxxxxxxxxx",
+        "xxxxxxxxxxx",
+        "xxx     xxx",
+        "xx       xx"
+    ]
+    
+    def __init__(self, screen_width):
+        self.shape = Obstacle.shape
+        self.block_size = 7
+        self.blocks = pygame.sprite.Group()
+        self.obstacle_amount = 4
+        self.obstacle_x_positions = [num * (screen_width / self.obstacle_amount) for num in range(self.obstacle_amount)]
+        self.create_multiple_obstacles(*self.obstacle_x_positions, x_start = screen_width / 15, y_start = 505)
+
+    def create_obstacle(self, x_start, y_start, offset_x):
+        for row_index, row in enumerate(self.shape):
+            for col_index, col in enumerate(row):
+                if col == "x":
+                    x = x_start + col_index * self.block_size + offset_x
+                    y = y_start + row_index * self.block_size
+                    block = Block(self.block_size, (6, 201, 145), x, y)  # Use Block directly
+                    self.blocks.add(block)
+
+    def create_multiple_obstacles(self, *offset, x_start, y_start):
+        for offset_x in offset:
+            self.create_obstacle(x_start, y_start, offset_x)
 
 def fade_in_intro(screen, intro_bg, fade_duration, fade_start_time):
     pygame.time.delay(15)  # Add a small delay for a smoother fade-in
@@ -54,6 +92,7 @@ def main():
     player_speed = 5
 
     lasers = pygame.sprite.Group()
+    obstacle = Obstacle(screen_width)
 
     running = True
     while running:
@@ -84,6 +123,8 @@ def main():
 
         lasers.update()
         lasers.draw(screen)
+        obstacle.blocks.update()
+        obstacle.blocks.draw(screen)
         
 
         pygame.display.flip()
