@@ -1,51 +1,36 @@
 import pygame
 import sys
 import os
-import random
 from obstacles import Block
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-class Alien(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+class AlienBlock(pygame.sprite.Group):
+    def __init__(self, screen_width, screen_height):
         super().__init__()
-        self.image = pygame.image.load('rocket_kitty_alien.png')
-        self.rect = self.image.get_rect()
-        self.rect.topleft = (x, y)
-        self.speed = random.randint(1, 3)  # Adjust the speed as needed
-
-    def update(self):
-        self.rect.x += self.speed
-        if self.rect.left < 0 or self.rect.right > 750:  # Adjust the screen width
-            self.speed = -self.speed
-            self.rect.y += 20  # Adjust the vertical movement
-
-class AlienGroup(pygame.sprite.Group):
-    def __init__(self, number_of_aliens):
-        super().__init__()
-        self.number_of_aliens = number_of_aliens
-        self.aliens = self.create_aliens()
-
-        self.speed = 5  # Adjust the speed as needed
+        self.alien_size = 30
+        self.alien_speed = 2
         self.direction = 1  # 1 for right, -1 for left
 
-    def create_aliens(self):
-        aliens = pygame.sprite.Group()
-        for _ in range(self.number_of_aliens):
-            alien = Alien()  # Assuming you have an Alien class
-            aliens.add(alien)
-        return aliens
+        # Load alien image
+        alien_image = pygame.image.load('rocket_kitty_alien.png')
+        alien_image = pygame.transform.scale(alien_image, (self.alien_size, self.alien_size))
 
-    def update(self, screen):
-        self.rect.x += self.speed * self.direction
+        for row in range(5):
+            for col in range(8):
+                alien = pygame.sprite.Sprite()
+                alien.image = alien_image
+                alien.rect = alien.image.get_rect()
+                alien.rect.x = col * 50
+                alien.rect.y = row * 50
+                self.add(alien)
 
-        # Change direction if the group reaches the screen edges
-        if self.rect.left < 0 or self.rect.right > screen.get_width():
-            self.direction *= -1
+    def update(self):
+        for alien in self.sprites():
+            alien.rect.x += self.direction * self.alien_speed
 
-    def draw(self, surface):
-        self.aliens.draw(surface)
-
+            if alien.rect.right >= 750 or alien.rect.left <= 0:
+                self.direction *= -1
 
 class Laser(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -132,7 +117,7 @@ def main():
     player_y = screen.get_height() - player_img.get_height()
     player_speed = 5
 
-    alien_group = AlienGroup(number_of_aliens=10)  # Adjust the number of aliens as needed
+    aliens = AlienBlock(screen_width, screen_height)
     lasers = pygame.sprite.Group()
     obstacle = Obstacle(screen_width)
 
@@ -163,8 +148,8 @@ def main():
             screen.blit(pygame.transform.scale(background, (750, 660)), (0, 0))
             screen.blit(player_img, (player_x, player_y))
 
-        alien_group.update(screen)
-        alien_group.draw(screen, screen)
+        aliens.update()
+        aliens.draw(screen)
         lasers.update()
         lasers.draw(screen)
         obstacle.blocks.update()
