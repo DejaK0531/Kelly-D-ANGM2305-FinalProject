@@ -1,36 +1,39 @@
 import pygame
 import sys
 import os
+import random
 from obstacles import Block
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-class AlienBlock(pygame.sprite.Group):
-    def __init__(self, screen_width, screen_height):
+class Alien(pygame.sprite.Sprite):
+    def __init__(self, x, y, size):
         super().__init__()
-        self.alien_size = 30
-        self.alien_speed = 2
-        self.direction = 1  # 1 for right, -1 for left
-
-        # Load alien image
-        alien_image = pygame.image.load('rocket_kitty_alien.png')
-        alien_image = pygame.transform.scale(alien_image, (self.alien_size, self.alien_size))
-
-        for row in range(5):
-            for col in range(8):
-                alien = pygame.sprite.Sprite()
-                alien.image = alien_image
-                alien.rect = alien.image.get_rect()
-                alien.rect.x = col * 50
-                alien.rect.y = row * 50
-                self.add(alien)
+        self.image = pygame.image.load('rocket_kitty_alien.png')
+        self.image = pygame.transform.scale(self.image, (size, size))  # Adjust the size of the alien
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+        self.speed = 10  # Adjust the speed as needed
 
     def update(self):
-        for alien in self.sprites():
-            alien.rect.x += self.direction * self.alien_speed
+        self.rect.x += self.speed
+        if self.rect.left < 0 or self.rect.right > 750:  # Adjust the screen width
+            self.speed = -self.speed
+            self.rect.y += 20  # Adjust the vertical movement
 
-            if alien.rect.right >= 750 or alien.rect.left <= 0:
-                self.direction *= -1
+
+class AlienGroup(pygame.sprite.Group):
+    def __init__(self, number_of_aliens, alien_size):
+        super().__init__()
+        self.create_aliens(number_of_aliens, alien_size)  # Adjusted the method name
+        self.alien_size = alien_size  # Store the size of the aliens
+
+    def create_aliens(self, number_of_aliens, alien_size):  # Updated method to accept the number of aliens and size
+        for _ in range(number_of_aliens):  # Use the provided number_of_aliens
+            x = random.randint(0, 750 - alien_size)  # Adjust the screen width and alien size
+            y = random.randint(50, 200)  # Adjust the starting vertical position
+            alien = Alien(x, y, alien_size)  # Specify x, y coordinates, and size
+            self.add(alien)
 
 class Laser(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -117,7 +120,7 @@ def main():
     player_y = screen.get_height() - player_img.get_height()
     player_speed = 5
 
-    aliens = AlienBlock(screen_width, screen_height)
+    alien_group = AlienGroup(number_of_aliens = 15, alien_size = 55)  # Adjust the number of aliens and size as needed
     lasers = pygame.sprite.Group()
     obstacle = Obstacle(screen_width)
 
@@ -143,21 +146,20 @@ def main():
             alpha = int((elapsed_time / fade_duration) * 255)
             intro_bg.set_alpha(alpha)
             screen.blit(pygame.transform.scale(intro_bg, (750, 660)), (0, 0))
-
         else:
             screen.blit(pygame.transform.scale(background, (750, 660)), (0, 0))
             screen.blit(player_img, (player_x, player_y))
 
-        aliens.update()
-        aliens.draw(screen)
         lasers.update()
         lasers.draw(screen)
         obstacle.blocks.update()
         obstacle.blocks.draw(screen)
-        
+        alien_group.update()  
+        alien_group.draw(screen)
 
         pygame.display.flip()
         clock.tick(30)
+
 
     pygame.quit()
     sys.exit()
