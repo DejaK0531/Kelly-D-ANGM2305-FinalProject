@@ -34,6 +34,7 @@ class Player(pygame.sprite.Sprite):
                 # Implement player death actions here (e.g., make the player invisible)
                 self.visible = False
                 self.rect.topleft = (-100, -100)  # Move the player off-screen
+                self.alien_group.stop_aliens()  # Stop the aliens when player is killed
 
         # Only update if the player is visible
         if self.visible:
@@ -47,13 +48,14 @@ class Alien(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         self.speed = 10
+        self.active = True  # Flag to indicate whether the alien is active
 
     def update(self):
-        global screen_width, screen_height  # Declare global variables
-        self.rect.x += self.speed
-        if self.rect.left < 0 or self.rect.right > screen_width:
-            self.speed = -self.speed
-            self.rect.y += 20
+        if self.active:
+            self.rect.x += self.speed
+            if self.rect.left < 0 or self.rect.right > 750:
+                self.speed = -self.speed
+                self.rect.y += 20
 
 class AlienGroup(pygame.sprite.Group):
     def __init__(self, number_of_aliens, alien_size):
@@ -63,10 +65,14 @@ class AlienGroup(pygame.sprite.Group):
 
     def create_aliens(self, number_of_aliens, alien_size):
         for _ in range(number_of_aliens):
-            x = random.randint(0, screen_width - alien_size)
+            x = random.randint(0, 750 - alien_size)
             y = random.randint(50, 200)
             alien = Alien(x, y, alien_size)
             self.add(alien)
+
+    def stop_aliens(self):
+        for alien in self.sprites():
+            alien.active = False
 
 class Laser(pygame.sprite.Sprite):
     def __init__(self, x, y, obstacle_group, alien_group):
