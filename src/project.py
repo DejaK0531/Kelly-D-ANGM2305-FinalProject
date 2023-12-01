@@ -47,7 +47,7 @@ class AlienLaser(pygame.sprite.Sprite):
         self.image.fill((247, 49, 15))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
-        self.speed = 6
+        self.speed = 5
 
     def update(self):
         self.rect.y += self.speed
@@ -170,7 +170,7 @@ def fade_in_intro(screen, intro_bg, fade_duration, fade_start_time):
         pygame.display.flip()
 
 def main():
-    global screen_width, screen_height, alien_group  # Declare variables as global
+    global screen_width, screen_height, alien_group
 
     pygame.init()
     screen = pygame.display.set_mode((screen_width, screen_height))
@@ -187,7 +187,6 @@ def main():
     # fade in the logo
     fade_in_intro(screen, intro_bg, fade_duration, fade_start_time)
 
-    # Move the initialization of alien_group before creating the Player instance
     alien_group = AlienGroup(number_of_aliens=15, alien_size=55)
     alien_lasers = pygame.sprite.Group()
     player = Player(screen_width // 2 - player_img.get_width() // 2, screen_height - player_img.get_height(), player_img, alien_group, screen)
@@ -208,30 +207,35 @@ def main():
         current_time = pygame.time.get_ticks()
         elapsed_time = current_time - fade_start_time
 
-        if elapsed_time < fade_duration:
-            alpha = int((elapsed_time / fade_duration) * 255)
-            intro_bg.set_alpha(alpha)
-            screen.blit(pygame.transform.scale(intro_bg, (screen_width, screen_height)), (0, 0))
-        else:
+        if elapsed_time >= fade_duration:  # Check if fading duration has elapsed
             screen.blit(pygame.transform.scale(background, (screen_width, screen_height)), (0, 0))
             screen.blit(player.image, player.rect.topleft)
 
-        lasers.update()
-        lasers.draw(screen)
-        obstacle.blocks.update()
-        obstacle.blocks.draw(screen)
-        alien_group.update(alien_lasers)
-        alien_group.draw(screen)
-        alien_lasers.update()
-        alien_lasers.draw(screen)
+            lasers.update()
+            lasers.draw(screen)
+            obstacle.blocks.update()
+            obstacle.blocks.draw(screen)
+            alien_group.update(alien_lasers)
+            alien_group.draw(screen)
+            alien_lasers.update()
+            alien_lasers.draw(screen)
 
-        # Check for collisions between lasers and obstacles
-        laser_obstacle_collision = pygame.sprite.groupcollide(lasers, obstacle.blocks, True, True)
-        # Check for collisions between lasers and aliens
-        laser_alien_collision = pygame.sprite.groupcollide(lasers, alien_group, True, True)
+            # Check for collisions between player lasers and obstacles
+            laser_obstacle_collision = pygame.sprite.groupcollide(lasers, obstacle.blocks, True, True)
+            # Check for collisions between player lasers and aliens
+            laser_alien_collision = pygame.sprite.groupcollide(lasers, alien_group, True, True)
 
-        pygame.display.flip()
-        clock.tick(30)
+            # Check for collisions between alien lasers and obstacles
+            alien_laser_obstacle_collision = pygame.sprite.groupcollide(alien_lasers, obstacle.blocks, True, True)
+            # Check for collisions between alien lasers and the player
+            alien_laser_player_collision = pygame.sprite.spritecollide(player, alien_lasers, True)
+            if alien_laser_player_collision:
+                player.visible = False
+                player.rect.topleft = (-100, -100)  # Move the player off-screen
+                alien_group.stop_aliens()  # Stop the aliens when player is killed
+
+            pygame.display.flip()
+            clock.tick(30)
 
     pygame.quit()
     sys.exit()
