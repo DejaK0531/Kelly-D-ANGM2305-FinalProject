@@ -15,7 +15,7 @@ class Player(pygame.sprite.Sprite):
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
-        self.speed = 5
+        self.speed = 7
         self.visible = True
         self.alien_group = alien_group
         self.screen = screen
@@ -47,7 +47,7 @@ class AlienLaser(pygame.sprite.Sprite):
         self.image.fill((247, 49, 15))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
-        self.speed = 5
+        self.speed = 6
 
     def update(self):
         self.rect.y += self.speed
@@ -65,7 +65,7 @@ class Alien(pygame.sprite.Sprite):
         self.active = True  # Flag to indicate whether the alien is active
 
     def shoot_laser(self, laser_group):
-        if random.randint(0, 100) < 2:  # Adjust the probability as needed
+        if random.randint(0, 500) < 3:  # Adjust the probability as needed
             laser = AlienLaser(self.rect.x + self.rect.width // 2, self.rect.y + self.rect.height)
             laser_group.add(laser)
 
@@ -76,7 +76,7 @@ class Alien(pygame.sprite.Sprite):
                 self.speed = -self.speed
                 self.rect.y += 20
 
-            self.shoot_laser(alien_lasers) 
+            self.shoot_laser(alien_lasers)
 
 class AlienGroup(pygame.sprite.Group):
     def __init__(self, number_of_aliens, alien_size):
@@ -102,7 +102,7 @@ class Laser(pygame.sprite.Sprite):
         self.image.fill((255, 255, 255))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
-        self.speed = -30  # Set speed to a negative value to make the laser move upwards
+        self.speed = -60
         self.obstacle_group = obstacle_group
         self.alien_group = alien_group
 
