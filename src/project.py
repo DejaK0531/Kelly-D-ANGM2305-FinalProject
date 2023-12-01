@@ -40,6 +40,20 @@ class Player(pygame.sprite.Sprite):
         if self.visible:
             self.screen.blit(self.image, self.rect.topleft)
                 
+class AlienLaser(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((5, 20))
+        self.image.fill((247, 49, 15))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.speed = 5
+
+    def update(self):
+        self.rect.y += self.speed
+        if self.rect.top > screen_height:
+            self.kill()
+
 class Alien(pygame.sprite.Sprite):
     def __init__(self, x, y, size):
         super().__init__()
@@ -50,12 +64,19 @@ class Alien(pygame.sprite.Sprite):
         self.speed = 10
         self.active = True  # Flag to indicate whether the alien is active
 
-    def update(self):
+    def shoot_laser(self, laser_group):
+        if random.randint(0, 100) < 2:  # Adjust the probability as needed
+            laser = AlienLaser(self.rect.x + self.rect.width // 2, self.rect.y + self.rect.height)
+            laser_group.add(laser)
+
+    def update(self, alien_lasers):  # Pass alien_lasers as a parameter
         if self.active:
             self.rect.x += self.speed
             if self.rect.left < 0 or self.rect.right > 750:
                 self.speed = -self.speed
                 self.rect.y += 20
+
+            self.shoot_laser(alien_lasers) 
 
 class AlienGroup(pygame.sprite.Group):
     def __init__(self, number_of_aliens, alien_size):
@@ -81,7 +102,7 @@ class Laser(pygame.sprite.Sprite):
         self.image.fill((255, 255, 255))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
-        self.speed = -10
+        self.speed = -30  # Set speed to a negative value to make the laser move upwards
         self.obstacle_group = obstacle_group
         self.alien_group = alien_group
 
@@ -168,9 +189,8 @@ def main():
 
     # Move the initialization of alien_group before creating the Player instance
     alien_group = AlienGroup(number_of_aliens=15, alien_size=55)
-
+    alien_lasers = pygame.sprite.Group()
     player = Player(screen_width // 2 - player_img.get_width() // 2, screen_height - player_img.get_height(), player_img, alien_group, screen)
-
     lasers = pygame.sprite.Group()
     obstacle = Obstacle(screen_width)
 
@@ -200,8 +220,10 @@ def main():
         lasers.draw(screen)
         obstacle.blocks.update()
         obstacle.blocks.draw(screen)
-        alien_group.update()
+        alien_group.update(alien_lasers)
         alien_group.draw(screen)
+        alien_lasers.update()
+        alien_lasers.draw(screen)
 
         # Check for collisions between lasers and obstacles
         laser_obstacle_collision = pygame.sprite.groupcollide(lasers, obstacle.blocks, True, True)
