@@ -24,14 +24,27 @@ class AlienGroup(pygame.sprite.Group):
     def __init__(self, number_of_aliens):
         super().__init__()
         self.number_of_aliens = number_of_aliens
-        self.create_aliens()
+        self.aliens = self.create_aliens()
+
+        self.speed = 5  # Adjust the speed as needed
+        self.direction = 1  # 1 for right, -1 for left
 
     def create_aliens(self):
+        aliens = pygame.sprite.Group()
         for _ in range(self.number_of_aliens):
-            x = random.randint(0, 750 - 40)  # Adjust the screen width and image width
-            y = random.randint(50, 200)  # Adjust the starting vertical position
-            alien = Alien(x, y)
-            self.add(alien)
+            alien = Alien()  # Assuming you have an Alien class
+            aliens.add(alien)
+        return aliens
+
+    def update(self, screen):
+        self.rect.x += self.speed * self.direction
+
+        # Change direction if the group reaches the screen edges
+        if self.rect.left < 0 or self.rect.right > screen.get_width():
+            self.direction *= -1
+
+    def draw(self, surface):
+        self.aliens.draw(surface)
 
 
 class Laser(pygame.sprite.Sprite):
@@ -150,8 +163,8 @@ def main():
             screen.blit(pygame.transform.scale(background, (750, 660)), (0, 0))
             screen.blit(player_img, (player_x, player_y))
 
-        alien_group.update()
-        alien_group.draw(screen)
+        alien_group.update(screen)
+        alien_group.draw(screen, screen)
         lasers.update()
         lasers.draw(screen)
         obstacle.blocks.update()
