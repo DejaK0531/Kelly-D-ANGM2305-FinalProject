@@ -49,11 +49,11 @@ class Player(pygame.sprite.Sprite):
 
         # Display the current score
         score_font = pygame.font.Font(None, 36)
-        score_text = score_font.render(f"Score: {self.score}", True, (255, 255, 255))
+        score_text = score_font.render(f"Score: {self.score}", True, (255, 178, 112))
         self.screen.blit(score_text, (10, 10))
 
         # Display the high score
-        high_score_text = score_font.render(f"High Score: {self.high_score}", True, (255, 255, 255))
+        high_score_text = score_font.render(f"High Score: {self.high_score}", True, (255, 178, 112))
         self.screen.blit(high_score_text, (10, 50))
 
         pygame.display.flip()  # Update the display
@@ -228,7 +228,7 @@ def main():
     game_over_rect = game_over_text.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
     play_again_rect = play_again_text.get_rect(center=(screen_width // 2, screen_height // 2 + 50))
     winner_rect = winner_text.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
-
+    
     running = True
     game_over = False
     winner = False
@@ -248,8 +248,11 @@ def main():
                 lasers.empty()
                 alien_lasers.empty()
                 obstacle.create_multiple_obstacles(*obstacle.obstacle_x_positions, x_start=screen_width / 15, y_start=505)
+                
+                # Pass the same alien_size value when creating new aliens
                 alien_group.empty()
-                alien_group.create_aliens(15, 55)
+                alien_group = AlienGroup(number_of_aliens=15, alien_size=70)
+                
                 player.visible = True
                 player.rect.topleft = (screen_width // 2 - player_img.get_width() // 2, screen_height - player_img.get_height())
 
