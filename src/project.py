@@ -10,6 +10,19 @@ screen_width = 750  # Define screen_width globally
 screen_height = 660  # Define screen_height globally
 
 class Player(pygame.sprite.Sprite):
+    """Class representing the player character.
+
+    Attributes:
+        image (pygame.Surface): The player's image.
+        rect (pygame.Rect): The player's rectangle.
+        speed (int): The player's movement speed.
+        visible (bool): Flag indicating player visibility.
+        alien_group (AlienGroup): Reference to the group of aliens.
+        screen (pygame.Surface): Reference to the game screen.
+        score (int): Current player score.
+        high_score (int): Highest player score achieved.
+        game_over (bool): Flag indicating game over state.
+    """
     def __init__(self, x, y, image, alien_group, screen):
         super().__init__()
         self.image = image
@@ -27,6 +40,11 @@ class Player(pygame.sprite.Sprite):
         self.game_over = False
 
     def update(self, game_over):
+        """Update the player's position and handle collisions.
+
+        Parameters:
+            game_over (bool): Flag indicating game over state.
+        """
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self.rect.x > 0:
             self.rect.x -= self.speed
@@ -59,6 +77,13 @@ class Player(pygame.sprite.Sprite):
         pygame.display.flip()  # Update the display
 
 class AlienLaser(pygame.sprite.Sprite):
+    """Class representing lasers shot by aliens.
+
+    Attributes:
+        image (pygame.Surface): The laser's image.
+        rect (pygame.Rect): The laser's rectangle.
+        speed (int): The speed at which the laser moves.
+    """
     def __init__(self, x, y):
         super().__init__()
         self.image = pygame.Surface((5, 20))
@@ -68,11 +93,21 @@ class AlienLaser(pygame.sprite.Sprite):
         self.speed = 6
 
     def update(self):
+        """Update the laser's position.
+        """
         self.rect.y += self.speed
         if self.rect.top > screen_height:
             self.kill()
 
 class Alien(pygame.sprite.Sprite):
+    """Class representing an alien enemy.
+
+    Attributes:
+        image (pygame.Surface): The alien's image.
+        rect (pygame.Rect): The alien's rectangle.
+        speed (int): The speed at which the alien moves.
+        active (bool): Flag indicating whether the alien is active.
+    """
     def __init__(self, x, y, size):
         super().__init__()
         self.image = pygame.image.load('rocket_kitty_alien.png')
@@ -83,11 +118,21 @@ class Alien(pygame.sprite.Sprite):
         self.active = True  # Flag to indicate whether the alien is active
 
     def shoot_laser(self, laser_group):
+        """Shoot a laser from the alien.
+
+        Parameters:
+            laser_group (pygame.sprite.Group): Group of lasers.
+        """
         if random.randint(0, 200) < 0.5:  # Adjust the probability as needed
             laser = AlienLaser(self.rect.x + self.rect.width // 2, self.rect.y + self.rect.height)
             laser_group.add(laser)
 
     def update(self, alien_lasers):  # Pass alien_lasers as a parameter
+        """Update the alien's position and behavior.
+
+        Parameters:
+            alien_lasers (pygame.sprite.Group): Group of alien lasers.
+        """
         if self.active:
             self.rect.x += self.speed
             if self.rect.left < 0 or self.rect.right > 750:
@@ -97,12 +142,23 @@ class Alien(pygame.sprite.Sprite):
             self.shoot_laser(alien_lasers)
 
 class AlienGroup(pygame.sprite.Group):
+    """Class representing a group of alien enemies.
+
+    Attributes:
+        alien_size (int): Size of each alien in the group.
+    """
     def __init__(self, number_of_aliens, alien_size):
         super().__init__()
         self.create_aliens(number_of_aliens, alien_size)
         self.alien_size = alien_size
 
     def create_aliens(self, number_of_aliens, alien_size):
+        """Create a specified number of aliens.
+
+        Parameters:
+            number_of_aliens (int): Number of aliens to create.
+            alien_size (int): Size of each alien.
+        """
         for _ in range(number_of_aliens):
             x = random.randint(0, 750 - alien_size)
             y = random.randint(30, 250)
@@ -110,10 +166,21 @@ class AlienGroup(pygame.sprite.Group):
             self.add(alien)
 
     def stop_aliens(self):
+        """Deactivate all aliens in the group."""
         for alien in self.sprites():
             alien.active = False
 
 class Laser(pygame.sprite.Sprite):
+    """Class representing player-fired lasers.
+
+    Attributes:
+        image (pygame.Surface): The laser's image.
+        rect (pygame.Rect): The laser's rectangle.
+        speed (int): The speed at which the laser moves.
+        obstacle_group (pygame.sprite.Group): Group of obstacles.
+        alien_group (AlienGroup): Reference to the group of aliens.
+        player (Player): Reference to the player.
+    """
     def __init__(self, x, y, obstacle_group, alien_group, player):        
         super().__init__()
         self.image = pygame.Surface((5, 20))
@@ -127,6 +194,7 @@ class Laser(pygame.sprite.Sprite):
 
 
     def update(self):
+        """Update the laser's position and handle collisions."""
         self.rect.y += self.speed
         if self.rect.bottom < 0:
             self.kill()
@@ -145,6 +213,15 @@ class Laser(pygame.sprite.Sprite):
             self.kill()
 
 class Obstacle(pygame.sprite.Sprite):
+    """Class representing obstacles in the game.
+
+    Attributes:
+        shape (list): List representing the shape of the obstacle.
+        block_size (int): Size of each block in the obstacle.
+        blocks (pygame.sprite.Group): Group of obstacle blocks.
+        obstacle_amount (int): Number of obstacles.
+        obstacle_x_positions (list): List of x-coordinates for obstacles.
+    """
     shape = [
         "  xxxxxxx",
         " xxxxxxxxx",
@@ -165,6 +242,13 @@ class Obstacle(pygame.sprite.Sprite):
         self.create_multiple_obstacles(*self.obstacle_x_positions, x_start=screen_width / 15, y_start=505)
 
     def create_obstacle(self, x_start, y_start, offset_x):
+        """Create a single obstacle.
+
+        Parameters:
+            x_start (int): Starting x-coordinate.
+            y_start (int): Starting y-coordinate.
+            offset_x (int): X-offset for positioning.
+        """
         for row_index, row in enumerate(self.shape):
             for col_index, col in enumerate(row):
                 if col == "x":
@@ -174,6 +258,13 @@ class Obstacle(pygame.sprite.Sprite):
                     self.blocks.add(block)
 
     def create_multiple_obstacles(self, *offset, x_start, y_start):
+        """Create multiple obstacles at specified positions.
+
+        Parameters:
+            *offset: X-offsets for positioning obstacles.
+            x_start (int): Starting x-coordinate.
+            y_start (int): Starting y-coordinate.
+        """
         self.blocks.empty()  # Clear existing obstacles before creating new ones
         for offset_x in offset:
             self.create_obstacle(x_start, y_start, offset_x)
