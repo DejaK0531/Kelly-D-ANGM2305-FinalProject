@@ -244,6 +244,7 @@ def main():
                 # Reset all game-related variables
                 game_over = False
                 winner = False
+                player.score = 0
                 lasers.empty()
                 alien_lasers.empty()
                 obstacle.create_multiple_obstacles(*obstacle.obstacle_x_positions, x_start=screen_width / 15, y_start=505)
