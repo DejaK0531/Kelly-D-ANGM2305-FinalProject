@@ -15,7 +15,7 @@ class Player(pygame.sprite.Sprite):
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
-        self.speed = 5
+        self.speed = 7
         self.visible = True
         self.alien_group = alien_group
         self.screen = screen
@@ -83,7 +83,7 @@ class Alien(pygame.sprite.Sprite):
         self.active = True  # Flag to indicate whether the alien is active
 
     def shoot_laser(self, laser_group):
-        if random.randint(0, 200) < 2:  # Adjust the probability as needed
+        if random.randint(0, 200) < 0.5:  # Adjust the probability as needed
             laser = AlienLaser(self.rect.x + self.rect.width // 2, self.rect.y + self.rect.height)
             laser_group.add(laser)
 
@@ -105,7 +105,7 @@ class AlienGroup(pygame.sprite.Group):
     def create_aliens(self, number_of_aliens, alien_size):
         for _ in range(number_of_aliens):
             x = random.randint(0, 750 - alien_size)
-            y = random.randint(50, 200)
+            y = random.randint(30, 250)
             alien = Alien(x, y, alien_size)
             self.add(alien)
 
@@ -212,7 +212,7 @@ def main():
     fade_in_intro(screen, intro_bg, fade_duration, fade_start_time)
 
     # Move the initialization of alien_group before creating the Player instance
-    alien_group = AlienGroup(number_of_aliens = 15, alien_size = 70)
+    alien_group = AlienGroup(number_of_aliens = 25, alien_size = 60)
     alien_lasers = pygame.sprite.Group()
     player = Player(screen_width // 2 - player_img.get_width() // 2, screen_height - player_img.get_height(),
                     player_img, alien_group, screen)
@@ -251,7 +251,7 @@ def main():
                 
                 # Pass the same alien_size value when creating new aliens
                 alien_group.empty()
-                alien_group = AlienGroup(number_of_aliens=15, alien_size=70)
+                alien_group = AlienGroup(number_of_aliens = 25, alien_size = 60)
                 
                 player.visible = True
                 player.rect.topleft = (screen_width // 2 - player_img.get_width() // 2, screen_height - player_img.get_height())
