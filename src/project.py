@@ -19,8 +19,14 @@ class Player(pygame.sprite.Sprite):
         self.visible = True
         self.alien_group = alien_group
         self.screen = screen
+        self.score = 0
+        self.high_score = 0
+        self.visible = True
+        self.alien_group = alien_group
+        self.screen = screen
+        self.game_over = False
 
-    def update(self):
+    def update(self, game_over):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self.rect.x > 0:
             self.rect.x -= self.speed
@@ -34,11 +40,23 @@ class Player(pygame.sprite.Sprite):
                 # Implement player death actions here (e.g., make the player invisible)
                 self.visible = False
                 self.rect.topleft = (-100, -100)  # Move the player off-screen
-                self.alien_group.stop_aliens()  # Stop the aliens when player is killed
+                self.alien_group.stop_aliens()  # Stop the aliens when the player is killed
+                self.game_over = True  # Set the game over flag
 
         # Only update if the player is visible
         if self.visible:
             self.screen.blit(self.image, self.rect.topleft)
+
+        # Display the current score
+        score_font = pygame.font.Font(None, 36)
+        score_text = score_font.render(f"Score: {self.score}", True, (255, 255, 255))
+        self.screen.blit(score_text, (10, 10))
+
+        # Display the high score
+        high_score_text = score_font.render(f"High Score: {self.high_score}", True, (255, 255, 255))
+        self.screen.blit(high_score_text, (10, 50))
+
+        pygame.display.flip()  # Update the display
 
 class AlienLaser(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -96,7 +114,7 @@ class AlienGroup(pygame.sprite.Group):
             alien.active = False
 
 class Laser(pygame.sprite.Sprite):
-    def __init__(self, x, y, obstacle_group, alien_group):
+    def __init__(self, x, y, obstacle_group, alien_group, player):        
         super().__init__()
         self.image = pygame.Surface((5, 20))
         self.image.fill((255, 255, 255))
@@ -105,6 +123,8 @@ class Laser(pygame.sprite.Sprite):
         self.speed = -40
         self.obstacle_group = obstacle_group
         self.alien_group = alien_group
+        self.player = player
+
 
     def update(self):
         self.rect.y += self.speed
@@ -119,6 +139,9 @@ class Laser(pygame.sprite.Sprite):
         # Check for collisions with aliens
         alien_collision = pygame.sprite.spritecollide(self, self.alien_group, True)
         if alien_collision:
+            self.player.score += 1
+            if self.player.score > self.player.high_score:
+                self.player.high_score = self.player.score
             self.kill()
 
 class Obstacle(pygame.sprite.Sprite):
@@ -214,7 +237,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not game_over:
-                laser = Laser(player.rect.x + player_img.get_width() // 2, player.rect.y, obstacle.blocks, alien_group)
+                laser = Laser(player.rect.x + player_img.get_width() // 2, player.rect.y, obstacle.blocks, alien_group, player)
                 lasers.add(laser)
 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN and (game_over or winner):
@@ -229,8 +252,7 @@ def main():
                 player.visible = True
                 player.rect.topleft = (screen_width // 2 - player_img.get_width() // 2, screen_height - player_img.get_height())
 
-
-        player.update()
+        player.update(game_over)
 
         current_time = pygame.time.get_ticks()
         elapsed_time = current_time - fade_start_time
